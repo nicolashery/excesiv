@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 from pymongo import Connection
 
 # Envrionment variables for config
-mongodb_uri = os.environ.get('MONGODB_URI', 'mongodb://localhost/excesiv')
+mongodb_uri = os.environ.get('MONGOLAB_URI', 'mongodb://localhost/excesiv')
 
 # Parse mongdb_uri
 mongodb_uri = urlsplit(mongodb_uri)
