@@ -8,15 +8,10 @@ from pymongo import Connection
 # Envrionment variables for config
 mongodb_uri = os.environ.get('MONGOLAB_URI', 'mongodb://localhost/excesiv')
 
-# Parse mongdb_uri
-mongodb_uri = urlsplit(mongodb_uri)
-db_name = mongodb_uri.path.strip('/')
-mongodb_uri = urlunsplit((mongodb_uri.scheme, mongodb_uri.netloc,
-                            '', '', ''))
-
 # Initialize
 app = Flask(__name__)
 connection = Connection(mongodb_uri)
+db_name = urlsplit(mongodb_uri).path.strip('/')
 db = connection[db_name]
 tasks = db.tasks
 results = db.results
