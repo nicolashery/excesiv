@@ -2,7 +2,7 @@ import os
 from time import sleep, time
 from urlparse import urlsplit, urlunsplit
 
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from pymongo import Connection
 
 # Envrionment variables for config
@@ -22,7 +22,7 @@ TASK_TIMEOUT = 5 # How long to wait for task to finish (in seconds)
 
 @app.route('/')
 def index():
-    return 'Excesiv'
+    return render_template('index.html')
 
 @app.route('/api/demo/')
 def demo():
