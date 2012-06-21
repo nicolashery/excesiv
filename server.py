@@ -2,9 +2,11 @@ import os
 from time import sleep, time
 from urlparse import urlsplit, urlunsplit
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, abort
+from werkzeug.wsgi import wrap_file
+from werkzeug.datastructures import Headers
 from pymongo import Connection
-from gridfs import GridFS
+from gridfs import GridFS, NoFile
 from bson.objectid import ObjectId
 
 # Envrionment variables for config
@@ -27,9 +29,9 @@ app.debug = APP_DEBUG
 
 def load_excel_templates():
     # Drop all templates currently in GridFS
-    for meta in fs_meta.find({'template': True}):
-        filename = meta['filename']
-        oid = meta['_id']
+    for doc in fs_meta.find({'template': True}):
+        filename = doc['filename']
+        oid = doc['_id']
         fs.delete(ObjectId(oid))
         print 'Dropped template %s' % filename
     # Load all Excel templates in the 'excel' directory
@@ -44,6 +46,40 @@ def load_excel_templates():
             f.close()
             print 'Loaded template %s' % filename
 
+# Mongo-Flask send file helper
+# Adapted from Flask-PyMongo
+# http://flask-pymongo.readthedocs.org/
+def send_mongo_file(file_id, mimetype=None, as_attachment=False,
+              attachment_filename=None, cache_timeout=60 * 60 * 12):
+        try:
+            f = fs.get(file_id)
+        except NoFile:
+            abort(404)
+
+        # Mostly copied from flask/helpers.py, with modifications for GridFS
+        if mimetype is None:
+            mimetype = f.content_type
+
+        headers = Headers()
+        if as_attachment:
+            if attachment_filename is None:
+                attachment_filename = f.name
+            headers.add('Content-Disposition', 'attachment',
+                        filename=attachment_filename)
+
+        data = wrap_file(request.environ, f, buffer_size=1024 * 256)
+
+        rv = app.response_class(data, mimetype=mimetype, headers=headers,
+                                direct_passthrough=True)
+        rv.content_length = f.length
+        rv.last_modified = f.upload_date
+        rv.set_etag(f.md5)
+        rv.cache_control.public = True
+        if cache_timeout:
+            rv.cache_control.max_age = cache_timeout
+            rv.expires = int(time() + cache_timeout)
+        return rv
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -51,11 +87,12 @@ def index():
 @app.route('/api/demo/')
 def demo():
     message = request.args.get('message')
+    template = 'demo.xlsx'
     if not message:
         return ('Message required', 400)
     # Create new task 
     # ('assigned' is required by the worker, and needs to be set to False)
-    task = {'message': message, 'assigned': False}
+    task = {'message': message, 'template': template, 'assigned': False}
     # Place cursor at the end of result set
     print 'Going to end of collection'
     cursor = results.find(tailable=True)
@@ -88,8 +125,14 @@ def demo():
             sleep(1)
     if timeout:
         return ('Task timed out', 504)
-    # Process result
-    return jsonify({'message': doc['message']})
+    # Get result file from database
+    mimetype = 'application/vnd.openxmlformats-officedocument.\
+                spreadsheetml.sheet'
+    oid = doc['file']['_id']
+    return send_mongo_file(ObjectId(oid), 
+                            mimetype=mimetype, 
+                            as_attachment=True,
+                            attachment_filename=template)
 
 # Initialize
 load_excel_templates()
