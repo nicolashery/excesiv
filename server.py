@@ -33,11 +33,11 @@ app.debug = APP_DEBUG
 
 def load_excel_templates():
     # Delete any result files still in database
-    for doc in fs_meta.find({'result': True}):
+    for doc in fs_meta.find({'label': 'result'}):
         oid = doc['_id']
         fs.delete(ObjectId(oid))    
     # Drop all templates currently in GridFS
-    for doc in fs_meta.find({'template': True}):
+    for doc in fs_meta.find({'label': 'template'}):
         filename = doc['filename']
         oid = doc['_id']
         fs.delete(ObjectId(oid))
@@ -50,7 +50,7 @@ def load_excel_templates():
         if extension == '.xlsx':
             filepath = os.path.join(excel_dir, filename)
             f = open(filepath, 'rb')
-            fs.put(f, filename=filename, template=True)
+            fs.put(f, filename=filename, label='template')
             f.close()
             print 'Loaded template %s' % filename
 
@@ -136,7 +136,7 @@ def demo():
     # Clean out any result file past expiration date
     # Note: Ideally I would want to delete a result file after I'm done 
     # sending back to the client, but I haven't figured out how to do that
-    for doc in fs_meta.find({'result': True}):
+    for doc in fs_meta.find({'label': 'result'}):
         age = (datetime.now(doc['uploadDate'].tzinfo) - 
                 doc['uploadDate']).total_seconds()
         if age > EXPIRE_RESULT_FILE:
