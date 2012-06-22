@@ -1,6 +1,7 @@
 import os
 from time import sleep, time
 from urlparse import urlsplit, urlunsplit
+from datetime import datetime
 
 from flask import Flask, render_template, request, abort
 from werkzeug.wsgi import wrap_file
@@ -14,11 +15,14 @@ mongodb_uri = os.environ.get('MONGOLAB_URI', 'mongodb://localhost/excesiv')
 
 # Other config
 APP_DEBUG = True
-TASK_TIMEOUT = 5 # How long to wait for task to finish (in seconds) 
+# How long to wait for task to finish (in seconds) 
+TASK_TIMEOUT = 10
+# How long to wait before deleting a result file (in seconds)
+EXPIRE_RESULT_FILE = 5 * 60
 
 # Setup
 app = Flask(__name__)
-connection = Connection(mongodb_uri)
+connection = Connection(mongodb_uri, tz_aware=True)
 db_name = urlsplit(mongodb_uri).path.strip('/')
 db = connection[db_name]
 tasks = db.tasks
@@ -28,6 +32,10 @@ fs_meta = db.fs.files
 app.debug = APP_DEBUG
 
 def load_excel_templates():
+    # Delete any result files still in database
+    for doc in fs_meta.find({'result': True}):
+        oid = doc['_id']
+        fs.delete(ObjectId(oid))    
     # Drop all templates currently in GridFS
     for doc in fs_meta.find({'template': True}):
         filename = doc['filename']
@@ -89,7 +97,7 @@ def demo():
     message = request.args.get('message')
     template = 'demo.xlsx'
     if not message:
-        return ('Message required', 400)
+        abort(404)
     # Create new task 
     # ('assigned' is required by the worker, and needs to be set to False)
     task = {'message': message, 'template': template, 'assigned': False}
@@ -117,22 +125,32 @@ def demo():
             break
         # Try to grab new doc from collection
         try:
-            doc = cursor.next()
+            result = cursor.next()
             # Break if we have the result for this task
-            if task_id == doc['task']['_id']:
+            if task_id == result['task']['_id']:
                 break
         except StopIteration:
             sleep(1)
     if timeout:
-        return ('Task timed out', 504)
-    # Get result file from database
+        abort(404)
+    # Clean out any result file past expiration date
+    # Note: Ideally I would want to delete a result file after I'm done 
+    # sending back to the client, but I haven't figured out how to do that
+    for doc in fs_meta.find({'result': True}):
+        age = (datetime.now(doc['uploadDate'].tzinfo) - 
+                doc['uploadDate']).total_seconds()
+        if age > EXPIRE_RESULT_FILE:
+            oid = doc['_id']
+            fs.delete(ObjectId(oid))    
+    # Get result file from database and send
     mimetype = 'application/vnd.openxmlformats-officedocument.\
                 spreadsheetml.sheet'
-    oid = doc['file']['_id']
-    return send_mongo_file(ObjectId(oid), 
+    file_id = ObjectId(result['file']['_id'])
+    response = send_mongo_file(file_id, 
                             mimetype=mimetype, 
                             as_attachment=True,
                             attachment_filename=template)
+    return response
 
 # Initialize
 load_excel_templates()
