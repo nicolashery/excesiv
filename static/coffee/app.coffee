@@ -26,7 +26,7 @@ App.onSend = ->
   if @message.length > 140
     @message = @message[0..139]
   $.ajax
-    url: '/api/demo/'
+    url: '/api/templates/demo'
     data:
       message: @message
     beforeSend: =>
@@ -34,10 +34,7 @@ App.onSend = ->
       @waiting = true
     success: (data) =>
       @response = data.message
-      output = """
-               <p><strong>Message</strong>: #{@message}</p>
-               <p><strong>Response</strong>: #{@response}</p>
-               """
+      output = "<p><a href='#{data.file_url}'>Download file</a></p>"
       @print output
       @waiting = false
 

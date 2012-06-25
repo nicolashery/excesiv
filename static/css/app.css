@@ -15,6 +15,16 @@ p {
   margin: 0;
 }
 
+a {
+  color: #08C;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+
 .clearfix {
   *zoom: 1;
 }

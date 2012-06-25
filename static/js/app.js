@@ -32,7 +32,7 @@
       this.message = this.message.slice(0, 140);
     }
     return $.ajax({
-      url: '/api/demo/',
+      url: '/api/templates/demo',
       data: {
         message: this.message
       },
@@ -43,7 +43,7 @@
       success: function(data) {
         var output;
         _this.response = data.message;
-        output = "<p><strong>Message</strong>: " + _this.message + "</p>\n<p><strong>Response</strong>: " + _this.response + "</p>";
+        output = "<p><a href='" + data.file_url + "'>Download file</a></p>";
         _this.print(output);
         return _this.waiting = false;
       }
