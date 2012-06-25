@@ -3,12 +3,12 @@ from time import sleep, time
 from urlparse import urlsplit, urlunsplit
 from datetime import datetime
 
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, jsonify
 from werkzeug.wsgi import wrap_file
 from werkzeug.datastructures import Headers
 from pymongo import Connection
 from gridfs import GridFS, NoFile
-from bson.objectid import ObjectId
+from bson.objectid import ObjectId, InvalidId
 
 # Envrionment variables for config
 mongodb_uri = os.environ.get('MONGOLAB_URI', 'mongodb://localhost/excesiv')
@@ -45,19 +45,22 @@ def load_excel_templates():
     # Load all Excel templates in the 'excel' directory
     excel_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                  'excel')
+    mimetype = \
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     for filename in os.listdir(excel_dir):
         _, extension = os.path.splitext(filename)
         if extension == '.xlsx':
             filepath = os.path.join(excel_dir, filename)
             f = open(filepath, 'rb')
-            fs.put(f, filename=filename, label='template')
+            fs.put(f, filename=filename, content_type=mimetype, 
+                    label='template')
             f.close()
             print 'Loaded template %s' % filename
 
 # Mongo-Flask send file helper
 # Adapted from Flask-PyMongo
 # http://flask-pymongo.readthedocs.org/
-def send_mongo_file(file_id, mimetype=None, as_attachment=False,
+def send_mongo_file(file_id, mimetype=None, as_attachment=True,
               attachment_filename=None, cache_timeout=60 * 60 * 12):
         try:
             f = fs.get(file_id)
@@ -71,7 +74,14 @@ def send_mongo_file(file_id, mimetype=None, as_attachment=False,
         headers = Headers()
         if as_attachment:
             if attachment_filename is None:
-                attachment_filename = f.name
+                # Check if file has attachment filename as metadata,
+                # else use filename
+                attachment_filename = fs_meta.find_one(file_id)
+                if attachment_filename is not None:
+                    attachment_filename = \
+                        attachment_filename.get('attachment_filename')
+                if attachment_filename is None:
+                    attachment_filename = f.name
             headers.add('Content-Disposition', 'attachment',
                         filename=attachment_filename)
 
@@ -88,19 +98,24 @@ def send_mongo_file(file_id, mimetype=None, as_attachment=False,
             rv.expires = int(time() + cache_timeout)
         return rv
 
+# ROUTING
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/api/demo/')
-def demo():
-    message = request.args.get('message')
-    template = 'demo.xlsx'
-    if not message:
-        abort(404)
+@app.route('/api/templates/<template>/')
+def templates(template):
+    # This part is specific to the template
+    message = request.args.get('message', 'Hello World!')
+    task_data = {'message': message}
+    template = '%s.xlsx' % template
+    attachment_filename = template
     # Create new task 
     # ('assigned' is required by the worker, and needs to be set to False)
-    task = {'message': message, 'template': template, 'assigned': False}
+    task = {'template': template, 'assigned': False,
+            'attachment_filename': attachment_filename}
+    task.update(task_data)
     # Place cursor at the end of result set
     print 'Going to end of collection'
     cursor = results.find(tailable=True)
@@ -142,14 +157,18 @@ def demo():
         if age > EXPIRE_RESULT_FILE:
             oid = doc['_id']
             fs.delete(ObjectId(oid))    
-    # Get result file from database and send
-    mimetype = 'application/vnd.openxmlformats-officedocument.\
-                spreadsheetml.sheet'
-    file_id = ObjectId(result['file']['_id'])
-    response = send_mongo_file(file_id, 
-                            mimetype=mimetype, 
-                            as_attachment=True,
-                            attachment_filename=template)
+    # Send back url to result file
+    file_url = '/api/files/%s' % result['file']['_id']
+    return jsonify(file_url=file_url)
+
+# Serves a MongoDB result file given the file id
+@app.route('/api/files/<id>')
+def files(id):
+    try:
+        file_id = ObjectId(id)
+    except InvalidId:
+        abort(404)
+    response = send_mongo_file(file_id)
     return response
 
 # Initialize
