@@ -114,8 +114,8 @@ def templates(template):
     # Create new task 
     # ('assigned' is required by the worker, and needs to be set to False)
     task = {'template': template, 'assigned': False,
-            'attachment_filename': attachment_filename}
-    task.update(task_data)
+            'attachment_filename': attachment_filename,
+            'data': task_data}
     # Place cursor at the end of result set
     print 'Going to end of collection'
     cursor = results.find(tailable=True)
