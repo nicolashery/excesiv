@@ -19,14 +19,32 @@ APP_DEBUG = True
 TASK_TIMEOUT = 10
 # How long to wait before deleting a result file (in seconds)
 EXPIRE_RESULT_FILE = 5 * 60
+# Capped collections settings
+CAPPED_COLLECTION_SIZE = 1000000
+CAPPED_COLLECTION_MAX = 3
 
 # Setup
 app = Flask(__name__)
 connection = Connection(mongodb_uri, tz_aware=True)
 db_name = urlsplit(mongodb_uri).path.strip('/')
 db = connection[db_name]
-tasks = db.tasks
-results = db.results
+# Create capped collections unless they exists already
+if 'tasks' in db.collection_names():
+    tasks = db.tasks
+else:
+    tasks = db.create_collection('tasks', capped=True, autoIndexId=True,
+                                size=CAPPED_COLLECTION_SIZE, 
+                                max=CAPPED_COLLECTION_MAX)
+    # Insert a dummy document just in case because some drivers have trouble 
+    # with empty capped collections
+    tasks.insert({'init': True})
+if 'results' in db.collection_names():
+    results = db.results
+else:
+    results = db.create_collection('results', capped=True, autoIndexId=True,
+                                size=CAPPED_COLLECTION_SIZE, 
+                                max=CAPPED_COLLECTION_MAX)
+    results.insert({'init': True})
 fs = GridFS(db)
 fs_meta = db.fs.files
 app.debug = APP_DEBUG
