@@ -11,7 +11,9 @@ from gridfs import GridFS, NoFile
 from bson.objectid import ObjectId, InvalidId
 
 # Envrionment variables for config
-mongodb_uri = os.environ.get('MONGOLAB_URI', 'mongodb://localhost/excesiv')
+# MONGOLAB_URI: Heroku, MONGODB_URL: Stackato
+mongodb_uri = os.environ.get('MONGOLAB_URI', 
+                os.environ.get('MONGODB_URL', 'mongodb://localhost/excesiv'))
 
 # Other config
 APP_DEBUG = True

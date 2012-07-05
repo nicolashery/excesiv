@@ -1,0 +1,13 @@
+name: excesiv
+
+framework:
+  type: python
+  runtime: python27
+
+processes:
+  web: python server.py
+
+services:
+  mongo-excesiv: mongodb
+
+ignores: ["venv", ".git"]
