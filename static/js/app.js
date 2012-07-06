@@ -13,10 +13,11 @@
   App.initialize = function() {
     var _this = this;
     this.$message = $("input[name='message']");
-    this.$output = $('.js-output');
-    return $('.js-send').on('click', function() {
+    this.$output = $('.js-download-result');
+    $('.js-send').on('click', function() {
       return _this.onSend();
     });
+    return this.initFileUpload();
   };
 
   App.onSend = function() {
@@ -32,7 +33,7 @@
       this.message = this.message.slice(0, 140);
     }
     return $.ajax({
-      url: '/api/templates/demo',
+      url: '/api/write/demo',
       data: {
         message: this.message
       },
@@ -53,6 +54,41 @@
   App.print = function(html) {
     this.$output.html(html);
     return this;
+  };
+
+  App.initFileUpload = function() {
+    var $filedrop;
+    $('#fileupload').fileupload({
+      url: '/api/read/demo',
+      dataType: 'json',
+      dropZone: $('#filedrop'),
+      add: function(e, data) {
+        if (data.files[0].name.match(/\.xlsx$/)) {
+          $('.js-upload-result').html("<p>Waiting for response...</p>");
+          return data.submit();
+        } else {
+          return $('.js-upload-result').html("<p>Only accepts .xlsx files</p>");
+        }
+      },
+      done: function(e, data) {
+        return $('.js-upload-result').html("<p>Response: " + data.result.response + "</p>");
+      }
+    });
+    $(document).bind('drop dragover', function(e) {
+      return e.preventDefault();
+    });
+    this;
+
+    $filedrop = $('#filedrop');
+    $filedrop.on('dragover', function(e) {
+      return $filedrop.addClass('hover');
+    });
+    $filedrop.on('dragleave', function(e) {
+      return $filedrop.removeClass('hover');
+    });
+    return $filedrop.on('drop', function(e) {
+      return $filedrop.removeClass('hover');
+    });
   };
 
   $(function() {

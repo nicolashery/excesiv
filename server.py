@@ -52,8 +52,10 @@ fs_meta = db.fs.files
 app.debug = APP_DEBUG
 
 def load_excel_templates():
-    # Delete any result files still in database
-    for doc in fs_meta.find({'label': 'result'}):
+    """Load Excel templates from disk to MongoDB"""
+    # Delete any result or task files still in database
+    for doc in fs_meta.find({'$or': [{'label': 'result'}, \
+                                    {'label': 'task'}]}):
         oid = doc['_id']
         fs.delete(ObjectId(oid))    
     # Drop all templates currently in GridFS
@@ -77,65 +79,59 @@ def load_excel_templates():
             f.close()
             print 'Loaded template %s' % filename
 
-# Mongo-Flask send file helper
-# Adapted from Flask-PyMongo
-# http://flask-pymongo.readthedocs.org/
+
 def send_mongo_file(file_id, mimetype=None, as_attachment=True,
               attachment_filename=None, cache_timeout=60 * 60 * 12):
-        try:
-            f = fs.get(file_id)
-        except NoFile:
-            abort(404)
+    """
+    Mongo-Flask send file helper
+    Adapted from Flask-PyMongo
+    http://flask-pymongo.readthedocs.org/
+    """
+    try:
+        f = fs.get(file_id)
+    except NoFile:
+        abort(404)
 
-        # Mostly copied from flask/helpers.py, with modifications for GridFS
-        if mimetype is None:
-            mimetype = f.content_type
+    # Mostly copied from flask/helpers.py, with modifications for GridFS
+    if mimetype is None:
+        mimetype = f.content_type
 
-        headers = Headers()
-        if as_attachment:
+    headers = Headers()
+    if as_attachment:
+        if attachment_filename is None:
+            # Check if file has attachment filename as metadata,
+            # else use filename
+            attachment_filename = fs_meta.find_one(file_id)
+            if attachment_filename is not None:
+                attachment_filename = \
+                    attachment_filename.get('attachment_filename')
             if attachment_filename is None:
-                # Check if file has attachment filename as metadata,
-                # else use filename
-                attachment_filename = fs_meta.find_one(file_id)
-                if attachment_filename is not None:
-                    attachment_filename = \
-                        attachment_filename.get('attachment_filename')
-                if attachment_filename is None:
-                    attachment_filename = f.name
-            headers.add('Content-Disposition', 'attachment',
-                        filename=attachment_filename)
+                attachment_filename = f.name
+        headers.add('Content-Disposition', 'attachment',
+                    filename=attachment_filename)
 
-        data = wrap_file(request.environ, f, buffer_size=1024 * 256)
+    data = wrap_file(request.environ, f, buffer_size=1024 * 256)
 
-        rv = app.response_class(data, mimetype=mimetype, headers=headers,
-                                direct_passthrough=True)
-        rv.content_length = f.length
-        rv.last_modified = f.upload_date
-        rv.set_etag(f.md5)
-        rv.cache_control.public = True
-        if cache_timeout:
-            rv.cache_control.max_age = cache_timeout
-            rv.expires = int(time() + cache_timeout)
-        return rv
+    rv = app.response_class(data, mimetype=mimetype, headers=headers,
+                            direct_passthrough=True)
+    rv.content_length = f.length
+    rv.last_modified = f.upload_date
+    rv.set_etag(f.md5)
+    rv.cache_control.public = True
+    if cache_timeout:
+        rv.cache_control.max_age = cache_timeout
+        rv.expires = int(time() + cache_timeout)
+    return rv
 
-# ROUTING
+def file_ext(filename):
+    """Get file extension from file name"""
+    if '.' in filename:
+        return filename.rsplit('.', 1)[1]
+    else:
+        return ''
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/api/templates/<template>/')
-def templates(template):
-    # This part is specific to the template
-    message = request.args.get('message', 'Hello World!')
-    task_data = {'message': message}
-    template = '%s.xlsx' % template
-    attachment_filename = template
-    # Create new task 
-    # ('assigned' is required by the worker, and needs to be set to False)
-    task = {'template': template, 'assigned': False,
-            'attachment_filename': attachment_filename,
-            'data': task_data}
+def process_task(task):
+    """Send task object to MongoDB queue, wait and return result"""
     # Place cursor at the end of result set
     print 'Going to end of collection'
     cursor = results.find(tailable=True)
@@ -162,28 +158,70 @@ def templates(template):
         try:
             result = cursor.next()
             # Break if we have the result for this task
-            if task_id == result['task']['_id']:
+            if task_id == result['task_id']:
                 break
         except StopIteration:
             sleep(1)
     if timeout:
-        abort(404)
-    # Clean out any result file past expiration date
+        return abort(404)
+    # Clean out any result or task file past expiration date
     # Note: Ideally I would want to delete a result file after I'm done 
     # sending back to the client, but I haven't figured out how to do that
-    for doc in fs_meta.find({'label': 'result'}):
+    for doc in fs_meta.find({'$or': [{'label': 'result'}, \
+                                    {'label': 'task'}]}):
         age = (datetime.now(doc['uploadDate'].tzinfo) - 
                 doc['uploadDate']).total_seconds()
         if age > EXPIRE_RESULT_FILE:
             oid = doc['_id']
-            fs.delete(ObjectId(oid))    
+            fs.delete(ObjectId(oid))
+    # Return result object
+    return result 
+
+# ROUTING
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/write/<template>')
+def write(template):
+    """Write data to an Excel file using a template"""
+    # This part is specific to the template
+    message = request.args.get('message', 'Hello World!')
+    template = '%s.xlsx' % template
+    task_data = {'message': message}
+    attachment_filename = template
+    # Create new task 
+    # ('assigned' is required by the worker, and needs to be set to False)
+    task = {'assigned': False, 'type': 'write', 'template': template, 
+            'data': task_data, 'attachment_filename': attachment_filename}
+    result = process_task(task)
     # Send back url to result file
-    file_url = '/api/files/%s' % result['file']['_id']
+    file_url = '/api/files/%s' % result['file_id']
     return jsonify(file_url=file_url)
 
-# Serves a MongoDB result file given the file id
+@app.route('/api/read/<template>', methods=['POST'])
+def read(template):
+    """Read data from an Excel file that follows a template"""
+    f = request.files.get('files[]') # This is the name of input[type='file']
+    if f and file_ext(f.filename) in ['xlsx']:
+        # Save file and metadata to MongoDB
+        filename = 'task_%s.xlsx' % template
+        content_type = f.content_type
+        attachment_filename = f.filename
+        file_id = fs.put(f, filename=filename, content_type=content_type, 
+                        label='task', attachment_filename=attachment_filename)
+        # Create new task
+        task = {'assigned': False, 'type': 'read', 'file_id': file_id}
+        result = process_task(task)
+        response = result['data'].get('response')
+        return jsonify(response=response)
+    else:
+        abort(400)
+
 @app.route('/api/files/<id>')
 def files(id):
+    """Serves a MongoDB result file given the file id"""
     try:
         file_id = ObjectId(id)
     except InvalidId:

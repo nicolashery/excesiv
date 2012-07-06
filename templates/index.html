@@ -7,7 +7,8 @@
   </head>
   <body>
     <div class="container">
-      <div class="message-box clearfix">
+      <h2>Type a message and click send...</h2>
+      <div class="task-box task-download clearfix">
         <div class="input-wrapper">
           <input name="message" type="text" value="Hello World!">
         </div>
@@ -15,9 +16,23 @@
           <button class="btn js-send">Send</button>
         </div>
       </div>
-      <div class="output-box js-output"></div>
+      <div class="result-box js-download-result"></div>
+      <h2>...or upload a .xlsx file with a message in cell A2</h2>
+      <div class="task-box task-upload">
+        <div id="fileupload">
+          <input type="file" name="files[]">
+          <div id="filedrop" class="filedrop">Or drop file here</div>
+        </div>
+      </div>
+      <div class="result-box js-upload-result"></div>
     </div>
+    <!-- jQuery -->
     <script src="/static/js/vendor/jquery.js"></script>
+    <!-- File Upload -->
+    <script src="/static/js/vendor/jquery.ui.widget.js"></script>
+    <script src="/static/js/vendor/jquery.iframe-transport.js"></script>
+    <script src="/static/js/vendor/jquery.fileupload.js"></script>
+    <!-- Application -->
     <script src="/static/js/app.js"></script>
   </body>
 </html>

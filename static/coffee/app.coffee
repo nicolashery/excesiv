@@ -9,9 +9,11 @@ App.waiting = false # Indicates we are waiting for a response
 App.initialize = ->
   # Cache elements
   @$message = $("input[name='message']")
-  @$output = $('.js-output')
+  @$output = $('.js-download-result')
   # Bind events
   $('.js-send').on('click', => @onSend())
+  # File upload widget
+  @initFileUpload()
 
 App.onSend = ->
   # Don't do anything if we are already waiting for response
@@ -26,7 +28,7 @@ App.onSend = ->
   if @message.length > 140
     @message = @message[0..139]
   $.ajax
-    url: '/api/templates/demo'
+    url: '/api/write/demo'
     data:
       message: @message
     beforeSend: =>
@@ -42,6 +44,39 @@ App.onSend = ->
 App.print = (html) ->
   @$output.html html
   @
+
+App.initFileUpload = ->
+  $('#fileupload').fileupload(
+
+    url: '/api/read/demo'
+
+    dataType: 'json'
+
+    dropZone: $('#filedrop')
+
+    add: (e, data) ->
+      if data.files[0].name.match(/\.xlsx$/)
+        $('.js-upload-result').html "<p>Waiting for response...</p>"
+        data.submit()
+      else
+        $('.js-upload-result').html "<p>Only accepts .xlsx files</p>"
+
+    done: (e, data) ->
+      $('.js-upload-result').html "<p>Response: #{data.result.response}</p>"
+
+  )
+  # Disable default browser action for file drops
+  $(document).bind 'drop dragover', (e) ->
+    e.preventDefault()
+  @
+  # Bind events to change drop zone style when file dragged over
+  $filedrop = $('#filedrop')
+  $filedrop.on 'dragover', (e) ->
+    $filedrop.addClass 'hover'
+  $filedrop.on 'dragleave', (e) ->
+    $filedrop.removeClass 'hover'
+  $filedrop.on 'drop', (e) ->
+    $filedrop.removeClass 'hover'
 
 # Start the app when DOM is loaded
 $ ->

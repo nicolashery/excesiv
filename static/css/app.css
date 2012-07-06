@@ -25,6 +25,14 @@ a:hover {
   text-decoration: underline;
 }
 
+h2 {
+  color: #1897D3;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
 .clearfix {
   *zoom: 1;
 }
@@ -47,12 +55,18 @@ a:hover {
   float: left;
 }
 
-.message-box {
+.task-box {
   margin-bottom: 10px;
 }
 
-.output-box {
+.filedrop {
+  margin-top: 10px;
+}
+
+.result-box {
   padding-left: 5px;
+  margin-bottom: 40px;
+  height: 24px;
 }
 
 input, button {
@@ -63,7 +77,7 @@ input, button {
   margin: 0;
 }
 
-input {
+input[type="text"] {
   display: block;
   .box-sizing(border-box);
   background: #fff;
@@ -81,6 +95,11 @@ input {
 
 input[type="text"]:focus {
   background: #E9E9E9;
+}
+
+input[type="file"] {
+  padding-right: 0;
+  padding-left: 0;
 }
 
 .btn {
@@ -121,11 +140,29 @@ input[type="text"]:focus {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#87d287', endColorstr='#6fb86f', GradientType=0);
 }
 
-.btn {
+.task-download .btn {
   margin-left: 5px;
   width: 70px;
 }
 
-input {
+.task-download input {
   width: 305px;
 }
+
+.filedrop  
+{  
+  font-weight: bold;
+  text-align: center;
+  padding: 20px 0;
+  color: #666;
+  border: 2px dashed #666;
+  border-radius: 7px;
+  cursor: default;
+}  
+
+.filedrop.hover  
+{  
+  /*color: #7ec77e;*/
+  /*border-color: #7ec77e;*/
+  background: #E9E9E9;
+}  
