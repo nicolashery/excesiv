@@ -20,6 +20,8 @@ class Excesiv:
     """Main class: connects to MongoDB, manages task queue and GridFS files"""
 
     def __init__(self):
+        # Registry to hold task methods for different templates
+        self.task_methods = {'write': {}, 'read': {}}
         pass
 
     def connect_db(self, mongodb_uri):
@@ -136,6 +138,19 @@ class Excesiv:
                 fs.delete(ObjectId(oid))
         # Return result object
         return result
+
+    def register_task_method(self, task_type, template, task_method):
+        """Add function to task method registry for a template"""
+        task_methods = self.task_methods
+        task_methods[task_type][template] = task_method
+
+    def get_task_method(self, task_type, template):
+        """Return task method registered for that template, or None"""
+        task_methods = self.task_methods
+        task_method = None
+        if task_type in task_methods:
+            task_method = task_methods[task_type].get(template)
+        return task_method
 
     def get_file(self, id):
         """Return file from id, None if no file"""

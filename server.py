@@ -105,15 +105,17 @@ def index():
 @excesiv_blueprint.route('/api/write/<template>')
 def write(template):
     """Write data to an Excel file using a template"""
-    # This part is specific to the template
-    message = request.args.get('message', 'Hello World!')
-    template = '%s.xlsx' % template
-    task_data = {'message': message}
-    attachment_filename = template
-    # Create new task 
+    # Task defaults
     # ('assigned' is required by the worker, and needs to be set to False)
-    task = {'assigned': False, 'type': 'write', 'template': template, 
-            'data': task_data, 'attachment_filename': attachment_filename}
+    task = {'assigned': False, 'type': 'write', 
+            'template': '%s.xlsx' % template, 
+            'data': {}, 
+            'attachment_filename': '%s.xlsx' % template}
+    # Use registered task method for this template to create new task
+    process_request = xs.get_task_method('write', template)
+    if not process_request:
+        abort(404)
+    task.update(process_request(request))
     result = xs.process_task(task)
     if not result:
         abort(404)
@@ -132,13 +134,19 @@ def read(template):
         attachment_filename = f.filename
         file_id = xs.fs.put(f, filename=filename, content_type=content_type, 
                         label='task', attachment_filename=attachment_filename)
-        # Create new task
+        # Create and process new task
         task = {'assigned': False, 'type': 'read', 'file_id': file_id}
         result = xs.process_task(task)
         if not result:
             abort(404)
-        response = result['data'].get('response')
-        return jsonify(response=response)
+        # Response defaults
+        response = {'response': ''}
+        # Pass results to registered task method for this template
+        process_result = xs.get_task_method('read', template)
+        if not process_result:
+            abort(404)
+        response.update(process_result(result))
+        return jsonify(response)
     else:
         abort(400)
 
@@ -154,6 +162,19 @@ def files(id):
 app = Flask(__name__)
 app.register_blueprint(excesiv_blueprint)
 app.debug = APP_DEBUG
+
+def demo_write(request):
+    """Write task method for the demo"""
+    message = request.args.get('message', 'Hello World!')
+    data = {'message': message}
+    return {'data': data}
+
+def demo_read(result):
+    """Read task method for the demo"""
+    return {'response': result['data'].get('response')}
+
+xs.register_task_method('write', 'demo', demo_write)
+xs.register_task_method('read', 'demo', demo_read)
 
 if __name__ == '__main__':
     app.run()
