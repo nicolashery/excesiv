@@ -27,15 +27,16 @@ App.onSend = ->
   # Trim if longer than 140 chars
   if @message.length > 140
     @message = @message[0..139]
+  data = JSON.stringify({message: @message})
   $.ajax
     url: '/api/write/demo'
-    data:
-      message: @message
+    type: 'POST'
+    contentType: 'application/json'
+    data: data
     beforeSend: =>
       @print "<p>Waiting for response...</p>"
       @waiting = true
     success: (data) =>
-      @response = data.message
       output = "<p><a href='#{data.file_url}'>Download file</a></p>"
       @print output
       @waiting = false

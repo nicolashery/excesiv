@@ -102,7 +102,7 @@ def file_ext(filename):
 def index():
     return render_template('index.html')
 
-@excesiv_blueprint.route('/api/write/<template>')
+@excesiv_blueprint.route('/api/write/<template>', methods=['POST'])
 def write(template):
     """Write data to an Excel file using a template"""
     # Task defaults
@@ -165,7 +165,7 @@ app.debug = APP_DEBUG
 
 def demo_write(request):
     """Write task method for the demo"""
-    message = request.args.get('message', 'Hello World!')
+    message = request.json.get('message', 'Hello World!')
     data = {'message': message}
     return {'data': data}
 

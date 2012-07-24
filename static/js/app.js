@@ -21,7 +21,8 @@
   };
 
   App.onSend = function() {
-    var _this = this;
+    var data,
+      _this = this;
     if (this.waiting) {
       return false;
     }
@@ -32,18 +33,20 @@
     if (this.message.length > 140) {
       this.message = this.message.slice(0, 140);
     }
+    data = JSON.stringify({
+      message: this.message
+    });
     return $.ajax({
       url: '/api/write/demo',
-      data: {
-        message: this.message
-      },
+      type: 'POST',
+      contentType: 'application/json',
+      data: data,
       beforeSend: function() {
         _this.print("<p>Waiting for response...</p>");
         return _this.waiting = true;
       },
       success: function(data) {
         var output;
-        _this.response = data.message;
         output = "<p><a href='" + data.file_url + "'>Download file</a></p>";
         _this.print(output);
         return _this.waiting = false;
