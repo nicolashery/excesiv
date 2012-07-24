@@ -7,6 +7,7 @@ from werkzeug.wsgi import wrap_file
 from werkzeug.datastructures import Headers
 
 from excesiv import Excesiv
+from demo import generate_demo_data, interpret_demo_data
 
 # CONFIG
 # -----------------------------------------------
@@ -175,6 +176,18 @@ def demo_read(result):
 
 xs.register_task_method('write', 'demo', demo_write)
 xs.register_task_method('read', 'demo', demo_read)
+
+def new_demo_write(request):
+    """Write task method for the demo"""
+    n_items = request.json.get('n_items', 50)
+    rand_max = request.json.get('rand_max', 3)
+    data = generate_demo_data(n_items, rand_max)
+    return {'data': data}
+
+def new_demo_read(result):
+    """Read task method for the demo"""
+    response = interpret_demo_data(result['data'])
+    return {'response': response}
 
 if __name__ == '__main__':
     app.run()
