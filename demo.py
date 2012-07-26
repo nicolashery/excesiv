@@ -17,7 +17,7 @@ def _to_float(value):
         res = 0
     return res
 
-def generate_demo_data(n_items, rand_max):
+def generate_demo_data(n_rows, rand_max):
     """Generates demo data to write to Excel template"""
     # Full data object example
     data = {
@@ -46,7 +46,7 @@ def generate_demo_data(n_items, rand_max):
     }
     # Row data
     rows = []
-    for i in range(1, n_items + 1):
+    for i in range(1, n_rows + 1):
         rows.append({
             'id_number': i,
             'data_w': _num_gen('row', rand_max),
@@ -104,11 +104,30 @@ def interpret_demo_data(data):
     }
     return response
 
+def test():
+    import os
+    import json
+    from excesiv import Excesiv
+    xs = Excesiv()
+    xs.connect_db('mongodb://localhost/excesiv')
+    template = 'test'
+    n_rows = 10
+    rand_max = 3
+    data = generate_demo_data(n_rows, rand_max)
+    task = {'assigned': False, 'type': 'write', 
+            'template': '%s.xlsx' % template, 
+            'data': data, 
+            'attachment_filename': '%s.xlsx' % template}
+    result = xs.process_task(task)
+    file_url = '/api/files/%s' % result['file_id']
+    print "File: http://localhost:5000%s" % file_url
+
 if __name__ == '__main__':
     # Some testing
-    import json
-    print json.dumps(generate_demo_data(2, 3), sort_keys=True, indent=2)
-    result = {
+    test()
+    #import json
+    #print json.dumps(generate_demo_data(2, 3), sort_keys=True, indent=2)
+    """result = {
         'header': {
             'header_r': 1,
             'header_wr': 2,
@@ -128,4 +147,5 @@ if __name__ == '__main__':
             }
         ]
     }
-    print json.dumps(interpret_demo_data(result), sort_keys=True, indent=2)
+    print json.dumps(interpret_demo_data(result), sort_keys=True, indent=2)"""
+

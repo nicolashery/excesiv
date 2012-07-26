@@ -101,7 +101,8 @@ def file_ext(filename):
 # -----------------------------------------------
 @excesiv_blueprint.route('/')
 def index():
-    return render_template('index.html')
+    return 'Demo not working for now'
+    #return render_template('index.html')
 
 @excesiv_blueprint.route('/api/write/<template>', methods=['POST'])
 def write(template):
@@ -179,9 +180,9 @@ xs.register_task_method('read', 'demo', demo_read)
 
 def new_demo_write(request):
     """Write task method for the demo"""
-    n_items = request.json.get('n_items', 50)
+    n_rows = request.json.get('n_rows', 50)
     rand_max = request.json.get('rand_max', 3)
-    data = generate_demo_data(n_items, rand_max)
+    data = generate_demo_data(n_rows, rand_max)
     return {'data': data}
 
 def new_demo_read(result):
