@@ -175,7 +175,7 @@ class Excesiv:
         meta = fs_meta.find_one(file_id)
         return meta
 
-    def xldate_to_datetime(xldate)
+    def xldate_to_datetime(xldate):
         """Convert Excel date float value to Python datetime"""
         return datetime(1899, 12, 30) + timedelta(days=xldate)
 
