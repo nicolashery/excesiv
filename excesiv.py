@@ -1,6 +1,6 @@
 import os
 from time import sleep, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from urlparse import urlsplit, urlunsplit
 
 from pymongo import Connection
@@ -174,3 +174,8 @@ class Excesiv:
             meta = None
         meta = fs_meta.find_one(file_id)
         return meta
+
+    def xldate_to_datetime(xldate)
+        """Convert Excel date float value to Python datetime"""
+        return datetime(1899, 12, 30) + timedelta(days=xldate)
+

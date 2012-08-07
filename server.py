@@ -11,7 +11,7 @@ from demo import generate_demo_data, interpret_demo_data
 
 # CONFIG
 # -----------------------------------------------
-APP_DEBUG = True
+APP_DEBUG = False
 FILE_INPUT_NAME = 'files[]' # This is the name of input[type='file']
 
 # MAIN OBJECTS

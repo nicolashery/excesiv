@@ -59,7 +59,6 @@ def generate_demo_data(n_rows, rand_max):
 
 def interpret_demo_data(data):
     """Interpret demo data read from Excel template"""
-    response = ''
     # Some statistics we will return
     n_header_items = 0
     n_header_items_new = 0
@@ -111,6 +110,7 @@ def test():
     xs = Excesiv()
     xs.connect_db('mongodb://localhost/excesiv')
     template = 'test'
+    print 'Testing write'
     n_rows = 10
     rand_max = 3
     data = generate_demo_data(n_rows, rand_max)
@@ -121,31 +121,20 @@ def test():
     result = xs.process_task(task)
     file_url = '/api/files/%s' % result['file_id']
     print "File: http://localhost:5000%s" % file_url
+    print 'Testing read'
+    filename = 'task_%s.xlsx' % template
+    content_type = \
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    f = open(filename, 'rb')
+    file_id = xs.fs.put(f, filename=filename, content_type=content_type, 
+                    label='task', attachment_filename='%s.xlsx' % template)
+    # Create and process new task
+    task = {'assigned': False, 'type': 'read', 'file_id': file_id}
+    result = xs.process_task(task)
+    response = interpret_demo_data(result['data'])
+    print json.dumps(response, sort_keys=True, indent=2)
 
 if __name__ == '__main__':
     # Some testing
     test()
-    #import json
-    #print json.dumps(generate_demo_data(2, 3), sort_keys=True, indent=2)
-    """result = {
-        'header': {
-            'header_r': 1,
-            'header_wr': 2,
-            'array_header_r': [1, 2, 3],
-            'array_header_wr': [1, 2, 3]
-        },
-        'rows': [
-            {
-                'data_r': 1,
-                'data_wr': 2,
-                'array_data_r': [1, 2, 3],
-                'array_data_wr': [1, 2, 3],
-                'formula_r': 1,
-                'formula_wr': 2,
-                'array_formula_r': [1, 2, 3],
-                'array_formula_wr': [1, 2, 3]
-            }
-        ]
-    }
-    print json.dumps(interpret_demo_data(result), sort_keys=True, indent=2)"""
 
