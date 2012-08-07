@@ -1,4 +1,7 @@
 import random
+from datetime import datetime
+
+from excesiv import datetime_to_xldate, xldate_to_datetime
 
 def _num_gen(method, rand_max):
     """Generate a random number for demo data"""
@@ -19,30 +22,18 @@ def _to_float(value):
 
 def generate_demo_data(n_rows, rand_max):
     """Generates demo data to write to Excel template"""
-    # Full data object example
-    data = {
-        'header': {
-            'header_w': 0,
-            'header_wr': 0,
-            'array_header_w': [0, 0, 0],
-            'array_header_wr': [0, 0, 0]
-        },
-        'rows': [
-            {
-                'id_number': 1,
-                'data_w': 0,
-                'data_wr': 0,
-                'array_data_w': [0, 0, 0],
-                'array_data_wr': [0, 0, 0]
-            }
-        ]
-    }
+    data = {}
     # Header data
     data['header'] = {
         'header_w': _num_gen('header', rand_max),
         'header_wr': _num_gen('header', rand_max),
         'array_header_w': [_num_gen('header', rand_max) for i in range(3)],
-        'array_header_wr': [_num_gen('header', rand_max) for i in range(3)]
+        'array_header_wr': [_num_gen('header', rand_max) for i in range(3)],
+        'type_data_numeric': rand_max,
+        'type_data_string': 'hello',
+        'type_data_boolean': True,
+        'type_data_date': datetime_to_xldate(datetime.now()),
+        'type_data_blank': None
     }
     # Row data
     rows = []
@@ -59,47 +50,43 @@ def generate_demo_data(n_rows, rand_max):
 
 def interpret_demo_data(data):
     """Interpret demo data read from Excel template"""
-    # Some statistics we will return
+    # Some statistics and tests we will return
     n_header_items = 0
-    n_header_items_new = 0
     n_row_items = 0
-    n_row_items_new = 0
     sum_header_items = 0
-    sum_header_items_new = 0
     sum_row_items = 0
-    sum_row_items_new = 0
+    cell_type_tests = {}
     # Header data
     for k, v in data['header'].iteritems():
-        # Convert all header values to list of floats
-        if not isinstance(v, list):
-            v = [v]
-        v = [_to_float(x) for x in v]
-        # Now use list methods to get statistics
-        if k.endswith('_r'):
-            n_header_items_new = n_header_items_new + len(v)
-            sum_header_items_new = sum_header_items_new + sum(v)
-        n_header_items = n_header_items + len(v)
-        sum_header_items = sum_header_items + sum(v)
+        # Cell type test header values
+        if k[:5] == 'type_':
+            # Convert Excel date to Python datetime, then to String for JSON
+            if k.endswith('_date'):
+                v = xldate_to_datetime(_to_float(v)).isoformat()
+            cell_type_tests[k] = v
+        # Other header values
+        else:
+            # Convert all header values to list of floats
+            if not isinstance(v, list):
+                v = [v]
+            v = [_to_float(x) for x in v]
+            # Now use list methods to get statistics
+            n_header_items = n_header_items + len(v)
+            sum_header_items = sum_header_items + sum(v)
     # Row data
     for row in data['rows']:
         for k, v in row.iteritems():
             if not isinstance(v, list):
                 v = [v]
             v = [_to_float(x) for x in v]
-            if k.endswith('_r'):
-                n_row_items_new = n_row_items_new + len(v)
-                sum_row_items_new = sum_row_items_new + sum(v)
             n_row_items = n_row_items + len(v)
             sum_row_items = sum_row_items + sum(v)
     response = {
         'n_header_items': n_header_items,
-        'n_header_items_new': n_header_items_new,
         'n_row_items': n_row_items,
-        'n_row_items_new': n_row_items_new,
         'sum_header_items': sum_header_items,
-        'sum_header_items_new': sum_header_items_new,
         'sum_row_items': sum_row_items,
-        'sum_row_items_new': sum_row_items_new
+        'cell_type_tests': cell_type_tests
     }
     return response
 
@@ -122,7 +109,7 @@ def test():
     file_url = '/api/files/%s' % result['file_id']
     print "File: http://localhost:5000%s" % file_url
     print 'Testing read'
-    filename = 'task_%s.xlsx' % template
+    filename = 'excel/work_%s.xlsx' % template
     content_type = \
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     f = open(filename, 'rb')
