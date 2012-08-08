@@ -167,28 +167,19 @@ app.debug = APP_DEBUG
 
 def demo_write(request):
     """Write task method for the demo"""
-    message = request.json.get('message', 'Hello World!')
-    data = {'message': message}
-    return {'data': data}
-
-def demo_read(result):
-    """Read task method for the demo"""
-    return {'response': result['data'].get('response')}
-
-xs.register_task_method('write', 'demo', demo_write)
-xs.register_task_method('read', 'demo', demo_read)
-
-def new_demo_write(request):
-    """Write task method for the demo"""
     n_rows = request.json.get('n_rows', 50)
     rand_max = request.json.get('rand_max', 3)
     data = generate_demo_data(n_rows, rand_max)
     return {'data': data}
 
-def new_demo_read(result):
+def demo_read(result):
     """Read task method for the demo"""
     response = interpret_demo_data(result['data'])
     return {'response': response}
+
+xs.register_task_method('write', 'demo', demo_write)
+xs.register_task_method('read', 'demo', demo_read)
+
 
 if __name__ == '__main__':
     app.run()
