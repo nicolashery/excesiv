@@ -1,0 +1,30 @@
+// Global styles and resets
+@import "base";
+
+// Global reset
+// ------------------------------------
+@import "compass/reset";
+
+* { @include box-sizing(border-box); }
+
+// Body
+// ------------------------------------
+body {
+  font-family: $baseFontFamily;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
+  color: $textColor;
+  background-color: $bodyBackground;
+}
+
+// Links
+// ------------------------------------
+a {
+  color: $linkColor;
+  text-decoration: none;
+
+  &:hover {
+    color: $linkColorHover;
+    text-decoration: none;
+  }
+}

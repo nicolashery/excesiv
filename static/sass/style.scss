@@ -1,7 +1,9 @@
-@import "compass";
+@import "base";
+@import "scaffolding";
+@import "typography";
+@import "layout";
 
-// Global reset
-// ------------------------------------
-@import "compass/reset";
-* { @include box-sizing(border-box); }
-
+body {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

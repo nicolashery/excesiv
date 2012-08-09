@@ -1,0 +1,12 @@
+// Page layout
+@import "base";
+
+// Basic layout
+// ------------------------------------
+.container {
+  margin: auto;
+  padding: 0 $containerPadding;
+  width: $containerWidth;
+  @include clearfix();
+  overflow: hidden;
+}

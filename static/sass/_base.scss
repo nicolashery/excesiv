@@ -1,0 +1,60 @@
+@import "compass";
+
+// Grays
+// ------------------------------------
+$black:                 #000;
+$grayDarker:            #444;
+$grayDark:              #666;
+$gray:                  #777;
+$grayLight:             #999;
+$grayLighter:           #aaa;
+$white:                 #fff;
+
+// Colors
+// ------------------------------------
+$primaryColor:          #2ba6cb;
+$primaryColorLight:     lighten($primaryColor, 15%);
+$primaryColorLighter:   lighten($primaryColor, 30%);
+$primaryColorLightest:  lighten($primaryColor, 40%);
+$primaryColorDark:      darken($primaryColor, 15%);
+$primaryColorDarker:    darken($primaryColor, 40%);
+$primaryColorDarkest:   darken($primaryColor, 50%);
+
+$textColor:             #4D4D4D;
+$bodyBackground:        $white;
+
+$linkColor:             $primaryColor;
+$linkColorHover:        $primaryColorDark;
+
+// Typography
+// ------------------------------------
+$baseFontFamily:        "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, "Lucida Grande", sans-serif;
+$baseFontSize:          18px;
+$baseLineHeight:        1;
+$paragraphLineHeight:   1.7;
+
+$h1FontSize:            $baseFontSize * 3;
+$h2FontSize:            $baseFontSize * 2;
+$h3FontSize:            $baseFontSize * 1.5;
+
+$headingsFontFamily:    inherit;
+$headingsFontWeight:    bold;
+$headingsColor:         inherit;
+
+$verticalSpacing:       30px;
+$verticalSpacingSmall:  20px;
+$verticalSpacingBig:    600px;
+
+// Container
+// ------------------------------------
+$containerPadding:      10px;
+$containerWidth:        600px;
+
+// Mixins
+// ------------------------------------
+// The micro clearfix http://nicolasgallagher.com/micro-clearfix-hack/
+@mixin clearfix() { *zoom:1;
+  &:before, &:after { content: ""; display: table; }
+  &:after { clear: both; }
+}
+
