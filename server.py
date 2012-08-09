@@ -101,8 +101,7 @@ def file_ext(filename):
 # -----------------------------------------------
 @excesiv_blueprint.route('/')
 def index():
-    return 'Demo not working for now'
-    #return render_template('index.html')
+    return render_template('index.html')
 
 @excesiv_blueprint.route('/api/write/<template>', methods=['POST'])
 def write(template):
@@ -164,6 +163,9 @@ def files(id):
 app = Flask(__name__)
 app.register_blueprint(excesiv_blueprint)
 app.debug = APP_DEBUG
+# This config value tells the demo app to use minified js & css in production,
+# by setting the environment variable APP_ENV=production
+app.config['APP_ENV'] = os.environ.get('APP_ENV', 'development') 
 
 def demo_write(request):
     """Write task method for the demo"""

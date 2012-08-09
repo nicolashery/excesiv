@@ -1,0 +1,7 @@
+@import "compass";
+
+// Global reset
+// ------------------------------------
+@import "compass/reset";
+* { @include box-sizing(border-box); }
+
