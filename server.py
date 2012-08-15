@@ -169,7 +169,7 @@ app.config['APP_ENV'] = os.environ.get('APP_ENV', 'development')
 
 def demo_write(request):
     """Write task method for the demo"""
-    n_rows = request.json.get('n_rows', 50)
+    n_rows = request.json.get('n_rows', 10)
     rand_max = request.json.get('rand_max', 3)
     data = generate_demo_data(n_rows, rand_max)
     return {'data': data}

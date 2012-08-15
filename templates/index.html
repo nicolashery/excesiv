@@ -59,14 +59,24 @@
       or how to use it in your own applications, be sure to visit the project's
       page on <a href="https://github.com/nicolahery/excesiv">GitHub</a>.</p> 
       
-    </div> {% if config.APP_ENV == 'production' %} <script
-    src="/static/build/vendor.min.js"></script> <script
-    src="/static/build/app.min.js"></script> {% else %}
-      <!-- jQuery -->
-      <script src="/static/js/vendor/jquery.js"></script>
-      <!-- File Upload -->
-      <script src="/static/js/vendor/jquery.ui.widget.js"></script> <script
-        src="/static/js/vendor/jquery.iframe-transport.js"></script> <script
-        src="/static/js/vendor/jquery.fileupload.js"></script>
-      <!-- Application -->
-      <script src="/static/js/app.js"></script> {% endif %} </body> </html>
+      </div>
+
+      <!-- JavaScript -->
+      {% if config.APP_ENV == 'production' %}
+        <script src="/static/build/vendor.min.js"></script>
+        <script src="/static/build/app.min.js"></script>
+      {% else %}
+        <!-- jQuery -->
+        <script src="/static/js/vendor/jquery.js"></script>
+        <!-- File Upload -->
+        <script src="/static/js/vendor/jquery.ui.widget.js"></script>
+        <script src="/static/js/vendor/jquery.iframe-transport.js"></script>
+        <script src="/static/js/vendor/jquery.fileupload.js"></script>
+        <!-- Application -->
+        <script src="/static/js/app.js"></script>
+        <!-- LiveReload -->
+        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+      {% endif %}
+  </body>
+</html>
+
