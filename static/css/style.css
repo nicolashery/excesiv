@@ -61,7 +61,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 }
 
 body {
-  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: "Droid Sans", sans-serif;
   font-size: 18px;
   line-height: 1;
   color: #4d4d4d;
@@ -92,7 +92,7 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size: 54px;
+  font-size: 72px;
 }
 
 h2 {
@@ -131,4 +131,8 @@ strong, b {
 body {
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+h1.header {
+  text-align: center;
 }
