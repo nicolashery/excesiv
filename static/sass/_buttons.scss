@@ -1,0 +1,50 @@
+// Buttons
+
+@import "base";
+
+// Core
+.btn {
+  display: inline-block;
+  padding: $btnTopBottomPadding $btnLeftRightPadding;
+  margin: 0;
+  font-size: $btnFontSize;
+  line-height: $btnLineHeight;
+  color: $btnTextColor;
+  font-weight: $btnFontWeight;
+  text-align: center;
+  text-shadow: $btnTextShadow;
+  vertical-align: middle;
+  cursor: pointer;
+  background: $btnBackground;
+  border: $btnBorderSize solid $btnBorderColor;
+  @include border-radius($btnBorderRadius);
+}
+
+// Hover state
+.btn:hover {
+  color: $btnTextColorHover;
+  text-decoration: none;
+  background: $btnBackgroundHover;
+  border-color: $btnBorderColorHover;
+}
+
+// Active state
+.btn:active {
+  background: $btnBackgroundActive;
+  background-image: none;
+  outline: 0;
+}
+
+// Focus state
+.btn:focus {
+  @include box-shadow(0 0 4px opacify($btnBackground, 0.3));
+  outline: 0;
+}
+
+// Button sizes
+.btn-large {
+  font-size: $btnFontSize + 6px;
+  line-height: 1;
+  padding: $btnTopBottomPadding + 5px $btnLeftRightPadding + 10px;
+}
+

@@ -27,7 +27,7 @@
       <p><em>Note: You will need Excel 2007+ installed on your computer.</em></p>
 
       <p><em>A word of warning: This is a technical demo, so it doesn't perform
-      anything actually useful. Its only meant to demonstrate the different
+      anything actually useful. It's only meant to demonstrate the different
       functionalities of Excesiv.</em></p>
 
       <h2>Generating an Excel workbook</h2>
@@ -41,7 +41,15 @@
       upper bound and populate an Excel template with the requested number of
       rows and some header data. Go ahead, try it!</p>
 
-      <p>[INTERFACE]</p>
+      <form>
+        <label>Number of rows (between 1 and 100)</label>
+        <input name="n_rows" type="text" value="10">
+        <label>Upper bound parameter (between 1 and 100)</label>
+        <input name="rand_max" type="text" value="3">
+        <div class="text-center">
+          <button class="btn btn-large">Generate</button>
+        </div>
+      </form>
 
       <h2>Reading an Excel workbook</h2>
 

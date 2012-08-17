@@ -17,8 +17,8 @@ $primaryColorLight:     lighten($primaryColor, 15%);
 $primaryColorLighter:   lighten($primaryColor, 30%);
 $primaryColorLightest:  lighten($primaryColor, 40%);
 $primaryColorDark:      darken($primaryColor, 15%);
-$primaryColorDarker:    darken($primaryColor, 40%);
-$primaryColorDarkest:   darken($primaryColor, 50%);
+$primaryColorDarker:    darken($primaryColor, 25%);
+$primaryColorDarkest:   darken($primaryColor, 30%);
 
 $textColor:             #4D4D4D;
 $bodyBackground:        $white;
@@ -49,6 +49,46 @@ $verticalSpacingBig:    60px;
 // ------------------------------------
 $containerPadding:      10px;
 $containerWidth:        600px;
+
+// Forms
+// ------------------------------------
+$inputFontSize:         $baseFontSize;
+$inputLineHeight:       $inputFontSize * 1.6;
+$inputTopBottomPadding: 5px;
+$inputLeftRightPadding: 10px;
+
+$inputTextColor:        $grayDarker;
+
+$inputBorderSize:       1px;
+$inputBorderColor:      $gray;
+$inputBorderColorFocus: $primaryColor;
+$inputBorderRadius:     3px;
+
+$inputBackground:       $white;
+$inputBackgroundFocus:  $primaryColorLightest;
+
+$labelTextColor:        $grayDarker;
+
+// Button
+// ------------------------------------
+$btnFontSize:           $baseFontSize;
+$btnLineHeight:         $btnFontSize;
+$btnTopBottomPadding:   10px;
+$btnLeftRightPadding:   20px;
+$btnFontWeight:         bold;
+
+$btnTextColor:          $white;
+$btnTextColorHover:     $btnTextColor;
+$btnTextShadow:         none;
+
+$btnBorderSize:         1px;
+$btnBorderColor:        $primaryColorDark;
+$btnBorderColorHover:   $primaryColorDarker;
+$btnBorderRadius:       0;
+
+$btnBackground:         $primaryColor;
+$btnBackgroundHover:    $primaryColorDark;
+$btnBackgroundActive:   $primaryColorDarker;
 
 // Mixins
 // ------------------------------------

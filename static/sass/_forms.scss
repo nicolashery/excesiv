@@ -1,0 +1,95 @@
+// Forms
+
+@import "base";
+
+// Form resets
+// ------------------------------------
+// Font size in all browsers, margin changes, misc consistency
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-size: 100%;
+  vertical-align: middle;
+}
+
+button,
+input {
+  *overflow: visible; // Inner spacing ie IE6/7
+  line-height: normal; // FF3/4 have !important on line-height in UA stylesheet
+}
+
+textarea {
+  overflow: auto; // Remove vertical scrollbar in IE6-9
+  vertical-align: top; // Readability and alignment cross-browser
+}
+
+// General
+// ------------------------------------
+form {
+  margin: 0 0 $verticalSpacingSmall 0;
+}
+
+// Font for form elements
+input,
+button,
+select,
+textarea {
+  // Only reset font family for those that need it (not label)
+  font-family: $baseFontFamily;
+}
+
+// Labels
+// ------------------------------------
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: $labelTextColor;
+}
+
+
+// Form controls
+// ------------------------------------
+// Shared size and type resets
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"] {
+  display: block;
+  padding: $inputTopBottomPadding $inputLeftRightPadding;
+  margin-bottom: $verticalSpacingSmall; 
+  font-size: $inputFontSize;
+  line-height: $inputLineHeight;
+  color: $inputTextColor;
+  background: $inputBackground;
+  border: $inputBorderSize solid $inputBorderColor;
+  @include border-radius($inputBorderRadius);  
+
+  // Focus state
+  &:focus {
+    background: $inputBackgroundFocus;
+    border-color: $inputBorderColorFocus;
+    outline: 0;
+    outline: thin dotted \9; /* IE6-9 */
+  }
+}
+
+select,
+textarea,
+input {
+  width: 100%
+}
+
