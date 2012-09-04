@@ -52,7 +52,6 @@ label {
 // Form controls
 // ------------------------------------
 // Shared size and type resets
-select,
 textarea,
 input[type="text"],
 input[type="password"],
@@ -93,3 +92,25 @@ input {
   width: 100%
 }
 
+// Set the height of select and file controls to match text inputs
+select,
+input[type="file"] {
+  display: block;
+  padding: $inputTopBottomPadding + $inputBorderSize 0; /* In IE7, the height of the select element cannot be changed by height, only font-size */
+  margin-bottom: $verticalSpacingSmall;
+  font-size: $inputFontSize;
+  line-height: $inputLineHeight;
+}
+
+// Disabled state
+// ------------------------------------
+// Disabled and read-only inputs
+input[disabled],
+select[disabled],
+textarea[disabled],
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  cursor: not-allowed;
+  background-color: $inputBackgroundDisabled;
+}

@@ -16,3 +16,33 @@ body {
 h1.header {
   text-align: center;
 }
+
+.well {
+  min-height: $verticalSpacingSmall;
+  padding: 19px;
+  margin-bottom: 20px;
+  background: #eee;
+  border: 1px solid #aaa;
+  @include border-radius(4px);
+}
+
+.filedrop {
+  font-size: $btnFontSize + 6px;
+  line-height: 1;
+  font-weight: bold;
+  text-align: center;
+  padding: 30px 0;
+  color: $grayDark;
+  background: $white;
+  border: 2px dashed $grayDark;
+  border-radius: 7px;
+  cursor: default;
+}  
+
+.filedrop.hover {
+  background: $primaryColorLightest;
+}
+
+.filedrop.disabled {
+  background: $inputBackgroundDisabled;
+}

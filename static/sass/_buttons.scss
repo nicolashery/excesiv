@@ -41,6 +41,15 @@
   outline: 0;
 }
 
+// Disabled state
+.btn.disabled,
+.btn[disabled] {
+  cursor: default;
+  background-color: $btnBackground;
+  background-image: none;
+  @include opacity(.65);
+}
+
 // Button sizes
 .btn-large {
   font-size: $btnFontSize + 6px;

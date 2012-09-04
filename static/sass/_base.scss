@@ -64,8 +64,9 @@ $inputBorderColor:      $gray;
 $inputBorderColorFocus: $primaryColor;
 $inputBorderRadius:     3px;
 
-$inputBackground:       $white;
-$inputBackgroundFocus:  $primaryColorLightest;
+$inputBackground:         $white;
+$inputBackgroundFocus:    $primaryColorLightest;
+$inputBackgroundDisabled: #eee;
 
 $labelTextColor:        $grayDarker;
 

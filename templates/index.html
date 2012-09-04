@@ -41,7 +41,7 @@
       upper bound and populate an Excel template with the requested number of
       rows and some header data. Go ahead, try it!</p>
 
-      <form>
+      <form class="well">
         <label>Number of rows (between 1 and 100)</label>
         <input name="n_rows" type="text" value="10">
         <label>Upper bound parameter (between 1 and 100)</label>
@@ -66,7 +66,10 @@
       different data types under the purple headers to show they are
       supported.</p>
 
-      <p>[INTERFACE]</p>
+      <form class="well">
+        <input type="file" name="files[]">
+        <div id="filedrop" class="filedrop">Or drop file here</div>
+      </form>
 
       <h2>That's it!</h2>
 
