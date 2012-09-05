@@ -121,8 +121,8 @@ def write(template):
     if not result:
         abort(404)
     # Send back url to result file
-    file_url = '/api/files/%s' % result['file_id']
-    return jsonify(file_url=file_url)
+    response = {'file_url': '/api/files/%s' % result['file_id']}
+    return jsonify(response)
 
 @excesiv_blueprint.route('/api/read/<template>', methods=['POST'])
 def read(template):
@@ -140,13 +140,12 @@ def read(template):
         result = xs.process_task(task)
         if not result:
             abort(404)
-        # Response defaults
-        response = {'response': ''}
         # Pass results to registered task method for this template
         process_result = xs.get_task_method('read', template)
         if not process_result:
             abort(404)
-        response.update(process_result(result))
+        # Send back processed result data
+        response = process_result(result)
         return jsonify(response)
     else:
         abort(400)
@@ -176,8 +175,7 @@ def demo_write(request):
 
 def demo_read(result):
     """Read task method for the demo"""
-    response = interpret_demo_data(result['data'])
-    return {'response': response}
+    return interpret_demo_data(result['data'])
 
 xs.register_task_method('write', 'demo', demo_write)
 xs.register_task_method('read', 'demo', demo_read)
