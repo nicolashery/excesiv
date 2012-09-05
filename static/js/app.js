@@ -10,6 +10,7 @@
       return "<a href='" + fileUrl + "'>Download Excel file</a>";
     },
     wrongFileType: '<span class="error">Sorry! We only accept .xslx files.</span>',
+    readerError: '<span class="error">Hum... There was an error processing that file. Try starting from one generated above?</span>',
     readerResult: function(result) {
       result = JSON.stringify(result, void 0, 2);
       return "<pre>" + result + "</pre>";
@@ -53,7 +54,11 @@
           return _this.$message.html("");
         },
         success: function(data) {
-          return _this.$message.html(messages.downloadLink(data.file_url));
+          if (data.error) {
+            return _this.$message.html(messages.error);
+          } else {
+            return _this.$message.html(messages.downloadLink(data.file_url));
+          }
         },
         error: function() {
           return _this.$message.html(messages.error);
@@ -146,7 +151,11 @@
         }
       },
       done: function(e, data) {
-        return _this.$message.html(messages.readerResult(data.result));
+        if (data.result.error) {
+          return _this.$message.html(messages.readerError);
+        } else {
+          return _this.$message.html(messages.readerResult(data.result));
+        }
       },
       fail: function() {
         return _this.$message.html(messages.error);

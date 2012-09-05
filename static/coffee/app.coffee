@@ -15,6 +15,7 @@
     downloadLink: (fileUrl) ->
       "<a href='#{fileUrl}'>Download Excel file</a>"
     wrongFileType: '<span class="error">Sorry! We only accept .xslx files.</span>'
+    readerError: '<span class="error">Hum... There was an error processing that file. Try starting from one generated above?</span>'
     readerResult: (result) ->
       # Pretty print JSON result
       result = JSON.stringify(result, undefined, 2)
@@ -67,8 +68,11 @@
             @toggleBusy() # Freeze form
             @$message.html("") # Empty message
           success: (data) =>
-            # Print download link to file
-            @$message.html messages.downloadLink(data.file_url)
+            # Print download link to file (unless an error was returned)
+            if data.error
+              @$message.html messages.error
+            else
+              @$message.html messages.downloadLink(data.file_url)
           error: =>
             @$message.html messages.error
           complete: =>
@@ -165,7 +169,10 @@
           @$message.html messages.wrongFileType
       # Success HTTP response
       done: (e, data) =>
-        @$message.html messages.readerResult(data.result)
+        if data.result.error
+          @$message.html messages.readerError
+        else
+          @$message.html messages.readerResult(data.result)
       # Error HTTP response
       fail: =>
         @$message.html messages.error

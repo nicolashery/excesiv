@@ -119,9 +119,14 @@ def write(template):
     task.update(process_request(request))
     result = xs.process_task(task)
     if not result:
+        # Probably timed out, i.e. worker not running
         abort(404)
-    # Send back url to result file
-    response = {'file_url': '/api/files/%s' % result['file_id']}
+    if 'error' in result.keys():
+        # We got an error processing the task
+        response = {'error': result['error']}
+    else:
+        # Send back url to result file
+        response = {'file_url': '/api/files/%s' % result['file_id']}
     return jsonify(response)
 
 @excesiv_blueprint.route('/api/read/<template>', methods=['POST'])
@@ -139,13 +144,18 @@ def read(template):
         task = {'assigned': False, 'type': 'read', 'file_id': file_id}
         result = xs.process_task(task)
         if not result:
+            # Probably timed out, i.e. worker not running
             abort(404)
-        # Pass results to registered task method for this template
-        process_result = xs.get_task_method('read', template)
-        if not process_result:
-            abort(404)
-        # Send back processed result data
-        response = process_result(result)
+        if 'error' in result.keys():
+            # We got an error processing the task
+            response = {'error': result['error']}
+        else:
+            # Pass results to registered task method for this template
+            process_result = xs.get_task_method('read', template)
+            if not process_result:
+                abort(404)
+            # Send back processed result data
+            response = process_result(result)
         return jsonify(response)
     else:
         abort(400)

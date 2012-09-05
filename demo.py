@@ -97,6 +97,7 @@ def test():
     xs = Excesiv()
     xs.connect_db('mongodb://localhost/excesiv')
     template = 'test'
+    """
     print 'Testing write'
     n_rows = 10
     rand_max = 3
@@ -108,8 +109,10 @@ def test():
     result = xs.process_task(task)
     file_url = '/api/files/%s' % result['file_id']
     print "File: http://localhost:5000%s" % file_url
+    """
     print 'Testing read'
-    filename = 'excel/work_%s.xlsx' % template
+    #filename = 'excel/work_%s.xlsx' % template
+    filename = 'test.xlsx'
     content_type = \
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     f = open(filename, 'rb')
@@ -118,7 +121,10 @@ def test():
     # Create and process new task
     task = {'assigned': False, 'type': 'read', 'file_id': file_id}
     result = xs.process_task(task)
-    response = interpret_demo_data(result['data'])
+    if 'error' in result.keys():
+        response = {'error': result['error']}
+    else:
+        response = interpret_demo_data(result['data'])
     print json.dumps(response, sort_keys=True, indent=2)
 
 if __name__ == '__main__':
