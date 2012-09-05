@@ -6,8 +6,13 @@
   Reader = App.Reader = {};
   messages = App.messages = {
     error: '<span class="error">Oops! An error occured. Please try <a href="/">refreshing</a> the page.</span>',
-    download: function(fileUrl) {
+    downloadLink: function(fileUrl) {
       return "<a href='" + fileUrl + "'>Download Excel file</a>";
+    },
+    wrongFileType: '<span class="error">Sorry! We only accept .xslx files.</span>',
+    readerResult: function(result) {
+      result = JSON.stringify(result, void 0, 2);
+      return "<pre>" + result + "</pre>";
     }
   };
   App.initialize = function() {
@@ -48,7 +53,7 @@
           return _this.$message.html("");
         },
         success: function(data) {
-          return _this.$message.html(messages.download(data.file_url));
+          return _this.$message.html(messages.downloadLink(data.file_url));
         },
         error: function() {
           return _this.$message.html(messages.error);
@@ -118,11 +123,62 @@
     }
   };
   Reader.busy = false;
-  Reader.initialize = function() {};
+  Reader.initialize = function() {
+    this.$fileInput = $("input[name='files[]']");
+    this.$dropZone = $('#filedrop');
+    this.$message = $('#js-reader-message');
+    return this.initFileUpload();
+  };
+  Reader.initFileUpload = function() {
+    var opts,
+      _this = this;
+    opts = {
+      url: '/api/read/demo',
+      dataType: 'json',
+      dropZone: this.$dropZone,
+      add: function(e, data) {
+        if (data.files[0].name.match(/\.xlsx$/)) {
+          _this.toggleBusy();
+          _this.$message.html("");
+          return data.submit();
+        } else {
+          return _this.$message.html(messages.wrongFileType);
+        }
+      },
+      done: function(e, data) {
+        return _this.$message.html(messages.readerResult(data.result));
+      },
+      fail: function() {
+        return _this.$message.html(messages.error);
+      },
+      always: function() {
+        return _this.toggleBusy();
+      }
+    };
+    $('#fileupload').fileupload(opts);
+    $(document).bind('drop dragover', function(e) {
+      return e.preventDefault();
+    });
+    this.$dropZone.on('dragover', function(e) {
+      return _this.$dropZone.addClass('hover');
+    });
+    this.$dropZone.on('dragleave', function(e) {
+      return _this.$dropZone.removeClass('hover');
+    });
+    return this.$dropZone.on('drop', function(e) {
+      return _this.$dropZone.removeClass('hover');
+    });
+  };
   Reader.toggleBusy = function() {
     if (this.busy) {
+      this.$fileInput.prop('disabled', false);
+      this.$dropZone.removeClass('disabled');
+      this.$dropZone.text('Or drop file here');
       this.busy = false;
     } else {
+      this.$fileInput.prop('disabled', true);
+      this.$dropZone.addClass('disabled');
+      this.$dropZone.text('Loading');
       this.busy = true;
     }
     return this;

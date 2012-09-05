@@ -55,4 +55,8 @@ h1.header {
 .form-message {
   text-align: center;
   margin-top: $verticalSpacingSmall; 
+
+  pre {
+    text-align: left;
+  }
 }

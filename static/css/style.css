@@ -117,6 +117,12 @@ strong, b {
   line-height: inherit;
 }
 
+pre {
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .container {
   margin: auto;
   padding: 0 10px;
@@ -353,4 +359,7 @@ h1.header {
 .form-message {
   text-align: center;
   margin-top: 20px;
+}
+.form-message pre {
+  text-align: left;
 }

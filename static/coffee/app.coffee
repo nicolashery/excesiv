@@ -12,8 +12,13 @@
   # Messages
   messages = App.messages =
     error: '<span class="error">Oops! An error occured. Please try <a href="/">refreshing</a> the page.</span>'
-    download: (fileUrl) ->
+    downloadLink: (fileUrl) ->
       "<a href='#{fileUrl}'>Download Excel file</a>"
+    wrongFileType: '<span class="error">Sorry! We only accept .xslx files.</span>'
+    readerResult: (result) ->
+      # Pretty print JSON result
+      result = JSON.stringify(result, undefined, 2)
+      "<pre>#{result}</pre>"
 
   # Start the application
   App.initialize = ->
@@ -63,7 +68,7 @@
             @$message.html("") # Empty message
           success: (data) =>
             # Print download link to file
-            @$message.html messages.download(data.file_url)
+            @$message.html messages.downloadLink(data.file_url)
           error: =>
             @$message.html messages.error
           complete: =>
@@ -135,12 +140,63 @@
   Reader.busy = false
 
   Reader.initialize = ->
+    # Cache elements
+    @$fileInput = $("input[name='files[]']")
+    @$dropZone = $('#filedrop')
+    @$message = $('#js-reader-message')
+    # Initialize file upload
+    @initFileUpload()
+
+  # Set up file upload plugin
+  Reader.initFileUpload = ->
+    opts =
+      url: '/api/read/demo'
+      dataType: 'json' # Expected return data type
+      dropZone: @$dropZone
+      # Fires when user selects or drops a file
+      add: (e, data) =>
+        # Do a quick check that file extension is correct
+        if data.files[0].name.match(/\.xlsx$/)
+          @toggleBusy() # Lock form
+          @$message.html("") # Empty message
+          # Send ajax request with attached file
+          data.submit()
+        else
+          @$message.html messages.wrongFileType
+      # Success HTTP response
+      done: (e, data) =>
+        @$message.html messages.readerResult(data.result)
+      # Error HTTP response
+      fail: =>
+        @$message.html messages.error
+      always: =>
+        @toggleBusy() # Unlock form
+
+    $('#fileupload').fileupload opts
+
+    # Disable default browser action for file drops
+    $(document).bind 'drop dragover', (e) ->
+      e.preventDefault()
+
+    # Bind events to change drop zone style when file dragged over
+    @$dropZone.on 'dragover', (e) =>
+      @$dropZone.addClass 'hover'
+    @$dropZone.on 'dragleave', (e) =>
+      @$dropZone.removeClass 'hover'
+    @$dropZone.on 'drop', (e) =>
+      @$dropZone.removeClass 'hover'
 
   # Toggle between busy and idle states
   Reader.toggleBusy = ->
     if @busy
+      @$fileInput.prop('disabled', false)
+      @$dropZone.removeClass 'disabled'
+      @$dropZone.text('Or drop file here')   
       @busy = false
     else
+      @$fileInput.prop('disabled', true)
+      @$dropZone.addClass 'disabled'
+      @$dropZone.text('Loading')  
       @busy = true
     @
 
