@@ -43,12 +43,13 @@
 
       <form class="well">
         <label>Number of rows (between 1 and 100)</label>
-        <input name="n_rows" type="text" value="10">
+        <input name="n_rows" type="text">
         <label>Upper bound parameter (between 1 and 100)</label>
-        <input name="rand_max" type="text" value="3">
+        <input name="rand_max" type="text">
         <div class="text-center">
-          <button class="btn btn-large">Generate</button>
+          <button id="js-writer-submit" class="btn btn-large">Generate</button>
         </div>
+        <div id="js-writer-message" class="form-message"></div>
       </form>
 
       <h2>Reading an Excel workbook</h2>
@@ -69,6 +70,7 @@
       <form class="well">
         <input type="file" name="files[]">
         <div id="filedrop" class="filedrop">Or drop file here</div>
+        <div id="js-reader-message" class="form-message"></div>
       </form>
 
       <h2>That's it!</h2>
@@ -93,7 +95,9 @@
         <!-- Application -->
         <script src="/static/js/app.js"></script>
         <!-- LiveReload -->
+        <!-- 
         <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+        -->
       {% endif %}
   </body>
 </html>

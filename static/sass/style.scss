@@ -26,6 +26,11 @@ h1.header {
   @include border-radius(4px);
 }
 
+.error {
+  color: $errorTextColor;
+  background: $errorBackground;
+}
+
 .filedrop {
   font-size: $btnFontSize + 6px;
   line-height: 1;
@@ -45,4 +50,9 @@ h1.header {
 
 .filedrop.disabled {
   background: $inputBackgroundDisabled;
+}
+
+.form-message {
+  text-align: center;
+  margin-top: $verticalSpacingSmall; 
 }

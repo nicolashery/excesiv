@@ -324,6 +324,11 @@ h1.header {
   border-radius: 4px;
 }
 
+.error {
+  color: #b94a48;
+  background: none;
+}
+
 .filedrop {
   font-size: 24px;
   line-height: 1;
@@ -343,4 +348,9 @@ h1.header {
 
 .filedrop.disabled {
   background: #eeeeee;
+}
+
+.form-message {
+  text-align: center;
+  margin-top: 20px;
 }
