@@ -18,9 +18,7 @@ FILE_INPUT_NAME = 'files[]' # This is the name of input[type='file']
 # -----------------------------------------------
 # The blueprint can be registered to any Flask app 
 # to give it Excesiv's functionalities
-excesiv_blueprint = Blueprint('excesiv', __name__, 
-                static_folder='static',
-                template_folder='templates')
+excesiv_blueprint = Blueprint('excesiv', __name__)
 
 # Core object to use task queue and file system
 xs = Excesiv()
@@ -99,10 +97,6 @@ def file_ext(filename):
 
 # ROUTING
 # -----------------------------------------------
-@excesiv_blueprint.route('/')
-def index():
-    return render_template('index.html')
-
 @excesiv_blueprint.route('/api/write/<template>', methods=['POST'])
 def write(template):
     """Write data to an Excel file using a template"""
@@ -166,30 +160,34 @@ def files(id):
     response = send_mongo_file(id)
     return response
 
-# APP
+# DEMO APP
 # -----------------------------------------------
-# This file can be run to use the blueprint directly as an app
-app = Flask(__name__)
-app.register_blueprint(excesiv_blueprint)
-app.debug = APP_DEBUG
-# This config value tells the demo app to use minified js & css in production,
-# by setting the environment variable APP_ENV=production
-app.config['APP_ENV'] = os.environ.get('APP_ENV', 'development') 
-
-def demo_write(request):
-    """Write task method for the demo"""
-    n_rows = request.json.get('n_rows', 10)
-    rand_max = request.json.get('rand_max', 3)
-    data = generate_demo_data(n_rows, rand_max)
-    return {'data': data}
-
-def demo_read(result):
-    """Read task method for the demo"""
-    return interpret_demo_data(result['data'])
-
-xs.register_task_method('write', 'demo', demo_write)
-xs.register_task_method('read', 'demo', demo_read)
-
+# Run this file to use the demo app
 
 if __name__ == '__main__':
+    @excesiv_blueprint.route('/')
+    def index():
+        return render_template('index.html')
+
+    app = Flask(__name__)
+    app.register_blueprint(excesiv_blueprint)
+    app.debug = APP_DEBUG
+    # This config value tells the demo app to use minified js & css in production,
+    # by setting the environment variable APP_ENV=production
+    app.config['APP_ENV'] = os.environ.get('APP_ENV', 'development') 
+
+    def demo_write(request):
+        """Write task method for the demo"""
+        n_rows = request.json.get('n_rows', 10)
+        rand_max = request.json.get('rand_max', 3)
+        data = generate_demo_data(n_rows, rand_max)
+        return {'data': data}
+
+    def demo_read(result):
+        """Read task method for the demo"""
+        return interpret_demo_data(result['data'])
+
+    xs.register_task_method('write', 'demo', demo_write)
+    xs.register_task_method('read', 'demo', demo_read)
+
     app.run()
