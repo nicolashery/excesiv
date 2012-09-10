@@ -8,6 +8,7 @@ from gridfs import GridFS, NoFile
 from bson.objectid import ObjectId, InvalidId
 
 # CONFIG
+# -----------------------------------------------
 # How long to wait for task to finish (in seconds) 
 TASK_TIMEOUT = 10
 # How long to wait before deleting a result file (in seconds)
@@ -16,8 +17,8 @@ EXPIRE_RESULT_FILE = 5 * 60
 CAPPED_COLLECTION_SIZE = 1000000
 CAPPED_COLLECTION_MAX = 3
 
-
 # HELPERS
+# -----------------------------------------------
 def datetime_to_xldate(pydate):
     """Convert Python datetime to Excel date float"""
     delta = pydate - datetime(1899, 12, 30)
@@ -28,6 +29,7 @@ def xldate_to_datetime(xldate):
     return datetime(1899, 12, 30) + timedelta(days=xldate)
 
 # MAIN CLASS
+# -----------------------------------------------
 class Excesiv:
     """Main class: connects to MongoDB, manages task queue and GridFS files"""
 
