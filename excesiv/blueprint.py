@@ -92,7 +92,7 @@ def file_ext(filename):
 
 # ROUTING
 # -----------------------------------------------
-@excesiv_blueprint.route('/api/write/<template>', methods=['POST'])
+@excesiv_blueprint.route('/api/write/<template>', methods=['GET', 'POST'])
 def write(template):
     """Write data to an Excel file using a template"""
     # Task defaults
@@ -149,7 +149,7 @@ def read(template):
     else:
         abort(400)
 
-@excesiv_blueprint.route('/api/files/<id>')
+@excesiv_blueprint.route('/api/files/<id>', methods=['GET'])
 def files(id):
     """Serves a MongoDB result file given the file id"""
     response = send_mongo_file(id)
