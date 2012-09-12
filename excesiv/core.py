@@ -14,8 +14,8 @@ TASK_TIMEOUT = 10
 # How long to wait before deleting a result file (in seconds)
 EXPIRE_RESULT_FILE = 5 * 60
 # Capped collections settings
-CAPPED_COLLECTION_SIZE = 1000000
-CAPPED_COLLECTION_MAX = 3
+CAPPED_COLLECTION_SIZE = 8000000
+CAPPED_COLLECTION_MAX = 100
 
 # HELPERS
 # -----------------------------------------------
