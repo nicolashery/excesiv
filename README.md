@@ -146,7 +146,7 @@ As mentioned before, Excesiv populates an Excel file used as a template (i.e. an
 
 Let's create a basic template to illustrate how this works. We'll put our template in the directory `yourproject/excel` and call it `fibonacci.xlsx`. Below is a screenshot of what the sheet looks like:
 
-![fibonacci.xlsx](nicolahery.github.com/excesiv/img/fibonacci01.png)
+![fibonacci.xlsx](https://raw.github.com/nicolahery/excesiv/master/img/fibonacci01.png)
 
 A couple things to note here:
 
@@ -156,7 +156,7 @@ A couple things to note here:
 
 Before Excesiv can use this file, we need to tell it where to populate data in the worksheet. This is where Excel's **named ranges** come in. Using the **Name Manager**, we define two named ranges (we will be using their names in our Python application):
 
-![fibonacci.xlsx](nicolahery.github.com/excesiv/img/fibonacci02.png)
+![fibonacci.xlsx](https://raw.github.com/nicolahery/excesiv/master/img/fibonacci02.png)
 
 What's important here, is the **Comment** of the named ranges. This is where we tell Excesiv to use that named range when inserting data in the Excel sheet and also what type of named range it is.
 
@@ -280,7 +280,7 @@ Finally navigate to `http://localhost:5000/api/write/fibonacci?n=11` and you sho
 
 Now if we go to `http://localhost:5000/api/files/504fa137ba9232aa912204a9` it will download the Excel file just created:
 
-![fibonacci.xlsx](nicolahery.github.com/excesiv/img/fibonacci03.png)
+![fibonacci.xlsx](https://raw.github.com/nicolahery/excesiv/master/img/fibonacci03.png)
 
 Congratulations, you just built your first Excesiv app! For more advanced usage, please take a look at the [demo](http://excesiv.herokuapp.com).
 
