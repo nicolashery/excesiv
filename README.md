@@ -168,6 +168,8 @@ The last thing to note in the Name Manager is that we defined a "constant" calle
 
 (*Note*: You don't have to, but I defined `fib_sequence` as a **relative named range** by removing the **$** in front of the **5** and making sure that my active cell was on row 5 when defining it. This allows me to use this name in formulas, and whichever row I'm on, the name will always point to the cell in column B of that same row. It is not very useful in this example, but the [demo](http://excesiv.herokuapp.com) workbook uses it.)
 
+When you are done, save and close the Excel workbook.
+
 Before we move on, we need to let Excesiv know which directory we are putting the Excel templates in. We do so by defining the Flask [configuration](http://flask.pocoo.org/docs/config/#configuration-basics) value `'EXCEL_DIR'`. In `app.py` add:
 
 ```python
@@ -263,16 +265,14 @@ Then fire up the app:
 $ python app.py
 ```
 
-Navigate to `http://localhost:5000/` to connect the app to the database and load the Excel templates. (Make sure you saved and closed the Excel workbook before doing this.)
-
-Then launch the JRuby worker, in a new console:
+And launch the JRuby worker in a new console:
 
 ```bash
 $ cd yourproject-worker/
 $ jruby worker.rb
 ```
 
-Finally navigate to `http://localhost:5000/api/write/fibonacci?n=11` and you should get a response that looks like:
+Navigate to `http://localhost:5000/api/write/fibonacci?n=11` and you should get a response that looks like:
 
 ```json
 {file_url: "/api/files/504fa137ba9232aa912204a9"}
@@ -311,13 +311,11 @@ Provision the MongoLab add-on that will create a MongoDB instance for the app:
 $ heroku addons:add mongolab
 ```
 
-Next, deploy the application:
+And deploy the application:
 
 ```bash
 $ git push heroku master
 ```
-
-Navigate to `http://yourproject.herokuapp.com/` to make sure it's running and to have the app connect to the database and load the templates.
 
 Now let's deploy the worker module. It is a JRuby app, which requires the use of a custom buildpack when creating it on Heroku:
 
