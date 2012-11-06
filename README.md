@@ -20,8 +20,8 @@ To better understand what Excesiv does, feel free to check out the [demo](http:/
 
 Excesiv is a polyglot application, so it is split up into two modules:
 
-- The [server](https://github.com/nicolahery/excesiv) (**Python**) (this repo)
-- The [worker](https://github.com/nicolahery/excesiv-worker) (**JRuby**)
+- The [server](https://github.com/nicolahery/excesiv) (Python) (this repo)
+- The [worker](https://github.com/nicolahery/excesiv-worker) (JRuby)
 
 The **Python server** is the main module. It offers the web interface to the user, handles user requests, optionally pulls data from a database, manipulates it, and sends tasks to the worker.
 
