@@ -1,0 +1,16 @@
+name: excesiv
+
+framework:
+  type: python
+  runtime: python27
+
+processes:
+  web: gunicorn app:app -b 0.0.0.0:$PORT -w 3
+
+services:
+  mongodb-excesiv: mongodb
+
+ignores: [".git", "venv", "node_modules", ".sass-cache"]
+
+instances: 1
+mem: 128

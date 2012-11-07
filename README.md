@@ -298,6 +298,15 @@ Also add a `requirements.txt` file with the following entry:
 
     git+git://github.com/nicolahery/excesiv
 
+Alternatively, you can use a more production-ready server like `gunicorn` by changing the `Procfile` to:
+
+    web: gunicorn app:app -b 0.0.0.0:$PORT -w 3
+
+And adding `gunicorn` to the `requirements.txt` file:
+
+    git+git://github.com/nicolahery/excesiv
+    gunicorn==0.15.0
+
 Create the app on [Heroku](http://www.heroku.com/):
 
 ```bash
@@ -317,7 +326,7 @@ And deploy the application:
 $ git push heroku master
 ```
 
-Now let's deploy the worker module. It is a JRuby app, which requires the use of a custom buildpack when creating it on Heroku:
+Now let's deploy the **worker** module. It is a JRuby app, which requires the use of a custom buildpack when creating it on Heroku:
 
 ```bash
 $ cd yourproject-worker/
@@ -340,6 +349,63 @@ $ heroku ps:scale worker=1
 ```
 
 Both modules are now deployed, running, and connected to the database.
+
+### Stackato
+
+The following will assume we are a deploying to a private [Stackato](http://www.activestate.com/stackato) VM that can be reached on the host `stackato.local`.
+
+Let's first deploy our main application, the one containing the **server** module. Like above for Heroku, make sure you have a `requirements.txt` file with dependencies (we'll also use `gunicorn` in this example):
+
+    git+git://github.com/nicolahery/excesiv
+    gunicorn==0.15.0
+
+Then create a `stackato.yml` configuration file, by copying the contents of the [stackato-sample.yml](/nicolahery/excesiv/blob/master/stackato-sample.yml) file from this repository. Make sure you change the `name` of the app at the top.
+
+Connect to the Stackato instance:
+
+```bash
+$ stackato target api.stackato.local
+$ stackato login user@example.com --passwd userpass
+```
+
+And push the application using the config file:
+
+```bash
+$ cd yourproject/
+$ stackato push -n
+```
+
+Now let's deploy the **worker** module. This is a little different than Heroku because at the time of writing, **Stackato v2.4** does not support JRuby worker processes out-of-the-box. To work around this, we will package our worker into a `.jar` file using [Warbler](https://github.com/jruby/warbler).
+
+First, install Warbler:
+
+```bash
+$ jruby -S gem install warbler
+```
+
+Then run the command:
+
+```bash
+$ cd yourproject-worker/
+$ jruby -S warble
+```
+
+This will create the `yourproject-worker.jar` file.
+
+Next, make a copy of the `stackato-sample.yml` file:
+
+```bash
+$ cp stackato-sample.yml stackato.yml
+```
+
+And change the `name` and `command` entries to reflect the name of your project and `jar` file.
+
+Finally, push the worker app:
+
+```bash
+$ stackato push -n
+```
+
 
 ## Limitations
 

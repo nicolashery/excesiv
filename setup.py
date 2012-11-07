@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='excesiv',
-    version='0.1dev',
+    version='0.1.0dev',
     author='Nicolas Hery',
     author_email='nicolahery@gmail.com',
     url='http://github.com/nicolahery/excesiv',

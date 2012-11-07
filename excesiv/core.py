@@ -10,7 +10,7 @@ from bson.objectid import ObjectId, InvalidId
 # CONFIG
 # -----------------------------------------------
 # How long to wait for task to finish (in seconds) 
-TASK_TIMEOUT = 10
+TASK_TIMEOUT = 3 * 60
 # How long to wait before deleting a result file (in seconds)
 EXPIRE_RESULT_FILE = 5 * 60
 # Capped collections settings

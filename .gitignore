@@ -4,3 +4,4 @@ venv
 node_modules
 .sass-cache
 excel/work_demo.xlsx
+stackato.yml

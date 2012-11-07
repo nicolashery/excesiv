@@ -5,7 +5,7 @@
     https://github.com/nicolahery/excesiv
 """
 
-__version__ = '0.1dev'
+__version__ = '0.1.0dev'
 
 # To add Excesiv to a Flask app
 from .blueprint import excesiv_blueprint, xs
